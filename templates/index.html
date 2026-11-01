@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Smart Building HVAC Optimization</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topbar">
+  <div><span class="eyebrow">BUILDING OPERATIONS</span><h1>Smart HVAC Dashboard</h1></div>
+  <span class="live-pill">● Demo monitoring</span>
+</header>
+<main>
+  <section class="intro">
+    <div><h2>Building overview</h2><p>Monitor indoor conditions, occupancy and energy use from one place.</p></div>
+    <div class="updated">Updated {{ state.last_updated }}</div>
+  </section>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}{% for category, message in messages %}
+      <div class="notice {{ category }}">{{ message }}</div>
+    {% endfor %}{% endif %}
+  {% endwith %}
+
+  <section class="metrics">
+    <article class="metric"><span>Indoor temperature</span><strong>{{ state.temperature }}°C</strong><small>Target: {{ state.setpoint }}°C</small></article>
+    <article class="metric"><span>Humidity</span><strong>{{ state.humidity }}%</strong><small>Comfort indicator</small></article>
+    <article class="metric"><span>Air-quality index</span><strong>{{ state.air_quality }}</strong><small>Illustrative sensor value</small></article>
+    <article class="metric"><span>Occupancy</span><strong>{{ state.occupancy }}</strong><small>People detected (demo)</small></article>
+    <article class="metric"><span>Energy consumed</span><strong>{{ state.energy_kwh }} kWh</strong><small>{{ energy_status }}</small></article>
+  </section>
+
+  <section class="panels">
+    <article class="panel">
+      <h2>HVAC controls</h2>
+      <p>Choose an operating mode and set a target temperature.</p>
+      <form action="{{ url_for('control') }}" method="post">
+        <label for="hvac_mode">Operating mode</label>
+        <select id="hvac_mode" name="hvac_mode">
+          {% for mode in ["Auto", "On", "Off"] %}
+          <option value="{{ mode }}" {% if state.hvac_mode == mode %}selected{% endif %}>{{ mode }}</option>
+          {% endfor %}
+        </select>
+        <label for="setpoint">Target temperature (16–30°C)</label>
+        <input id="setpoint" name="setpoint" type="number" min="16" max="30" step="0.5" value="{{ state.setpoint }}" required>
+        <button type="submit">Apply settings</button>
+      </form>
+      <div class="mode-summary">Current mode: <b>{{ state.hvac_mode }}</b></div>
+    </article>
+    <article class="panel">
+      <h2>System alerts</h2>
+      <p>Rule-based checks for conditions that may need attention.</p>
+      <ul class="alerts">
+        {% for alert in alerts %}<li>{{ alert }}</li>{% endfor %}
+      </ul>
+    </article>
+  </section>
+  <section class="footnote"><b>Prototype note:</b> readings are simulated for this academic demonstration. The controls update application state only; they do not operate physical HVAC equipment.</section>
+</main>
+<footer>Smart Building HVAC Optimization Platform · Git & Docker assignment</footer>
+</body>
+</html>

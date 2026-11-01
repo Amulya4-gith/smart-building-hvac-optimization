@@ -1,0 +1,10 @@
+services:
+  hvac-web:
+    build: .
+    container_name: smart-building-hvac
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: production
+      TZ: Asia/Kolkata
+    restart: unless-stopped
